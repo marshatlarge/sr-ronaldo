@@ -1,7 +1,14 @@
 body {
   font-family: monospace; /* Make the text monospace */
   margin-bottom: 200px;
-  margin-top: 100px;
+  margin-top: 50px;
+}
+
+.logo {
+  display: block; /* Add this line if .logo is an inline element like <img> */
+  width: 200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .table-wrapper {
