@@ -58,7 +58,8 @@ const createTable = (playerStats) => {
     row.insertCell().textContent = teams[stat.team_id].country;
     row.insertCell().textContent = competitions[stat.comp_id].name;
     row.insertCell().textContent = stat.games;
-    row.insertCell().textContent = stat.minutes;
+    // Format minutes with commas
+    row.insertCell().textContent = Number(stat.minutes).toLocaleString();
     row.insertCell().textContent = stat.goals;
     row.insertCell().textContent = stat.assists;
     row.insertCell().textContent = goalsPer90(stat.goals, stat.minutes);
