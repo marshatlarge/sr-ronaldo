@@ -7,6 +7,21 @@ const teams = {};
 // Function to calculate goals per 90 minutes
 const goalsPer90 = (goals, minutes) => ((goals / minutes) * 90).toFixed(2);
 
+// Function to calculate age
+const calculateAge = (birthDate, season) => {
+  const seasonStartYear = parseInt(season.split("-")[0]);
+  const seasonStartDate = new Date(seasonStartYear, 6, 1); // Assuming season starts in July
+  let age = seasonStartDate.getFullYear() - birthDate.getFullYear();
+  const monthDiff = seasonStartDate.getMonth() - birthDate.getMonth();
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && seasonStartDate.getDate() < birthDate.getDate())
+  ) {
+    age--;
+  }
+  return age;
+};
+
 // Function to create and append the table to the DOM
 const createTable = (playerStats) => {
   // Create table and thead elements
@@ -53,7 +68,7 @@ const createTable = (playerStats) => {
   document.body.appendChild(table);
 };
 
-// Enhanced CSV parser function to remove quotations
+// CSV parser function removes quotations
 const parseCSV = (csvText) => {
   const lines = csvText.trim().split("\n");
   const headers = lines
@@ -73,30 +88,45 @@ const parseCSV = (csvText) => {
 
 // Function to load and parse CSV data
 const loadCSVs = async () => {
-  // Fetch and parse competition data
+  // Load all CSV data asynchronously
   const compResponse = await fetch("./data/sr_dev_competitions.csv");
+  const peopleResponse = await fetch("./data/sr_dev_people.csv");
+  const teamResponse = await fetch("./data/sr_dev_teams.csv");
+  const statsResponse = await fetch("./data/sr_dev_stats.csv");
+
   const compCSV = await compResponse.text();
+  const peopleCSV = await peopleResponse.text();
+  const teamCSV = await teamResponse.text();
+  const statsCSV = await statsResponse.text();
+
+  // Parse and store competition data
   parseCSV(compCSV).forEach((d) => (competitions[d.comp_id] = d));
 
-  // Repeat for other CSV files
-  const peopleResponse = await fetch("./data/sr_dev_people.csv");
-  const peopleCSV = await peopleResponse.text();
+  // Parse and store people data
   parseCSV(peopleCSV).forEach((d) => (people[d.person_id] = d));
 
-  const teamResponse = await fetch("./data/sr_dev_teams.csv");
-  const teamCSV = await teamResponse.text();
+  // Get ronaldo's birthdate
+  const ronaldoPersonId = Object.keys(people).find(
+    (id) => people[id].name === "Cristiano Ronaldo"
+  );
+  const ronaldoBirthDate = new Date(people[ronaldoPersonId].birth_date);
+
+  // Parse and store team data
   parseCSV(teamCSV).forEach((d) => (teams[d.team_id] = d));
 
-  const statsResponse = await fetch("./data/sr_dev_stats.csv");
-  const statsCSV = await statsResponse.text();
+  // Process stats
   const ronaldoDomesticStats = parseCSV(statsCSV)
     .filter(
       (stat) =>
         people[stat.person_id]?.name === "Cristiano Ronaldo" &&
         competitions[stat.comp_id]?.scope === "domestic" &&
-        competitions[stat.comp_id]?.competition_format === "league" // Check if the competition format is league
+        competitions[stat.comp_id]?.competition_format === "league"
     )
-    .sort((a, b) => a.season.localeCompare(b.season)); // Sort by season
+    .sort((a, b) => a.season.localeCompare(b.season))
+    .map((stat) => ({
+      ...stat,
+      age: calculateAge(ronaldoBirthDate, stat.season),
+    }));
 
   createTable(ronaldoDomesticStats);
 };
