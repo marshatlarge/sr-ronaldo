@@ -1,6 +1,23 @@
+body {
+  font-family: monospace; /* Make the text monospace */
+  margin-bottom: 200px;
+  margin-top: 100px;
+}
+
+.table-wrapper {
+  overflow-x: auto; /* Enable horizontal scrolling */
+  margin: 20px 0; /* Add some spacing around the table */
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
+  font-size: 14px; /* Smaller font size */
+}
+
+h1 {
+  text-align: center;
+  padding: 10px;
 }
 
 table,
@@ -17,4 +34,15 @@ td {
 
 th {
   background-color: #f2f2f2;
+}
+
+@media screen and (min-width: 1024px) {
+  .table-wrapper {
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  table {
+    min-width: 1024px; /* Ensure table is wider on big screens */
+  }
 }

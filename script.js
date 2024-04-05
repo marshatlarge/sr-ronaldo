@@ -65,7 +65,11 @@ const createTable = (playerStats) => {
   });
 
   // Add the table to the body
-  document.body.appendChild(table);
+  // Inside your createTable function, before appending the table to the body
+  const wrapper = document.createElement("div");
+  wrapper.className = "table-wrapper";
+  wrapper.appendChild(table);
+  document.body.appendChild(wrapper);
 };
 
 // CSV parser function removes quotations
