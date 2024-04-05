@@ -49,6 +49,32 @@ const createTable = (playerStats) => {
     headerRow.appendChild(th);
   });
 
+  // Variables for totals
+  let totalGames = 0,
+    totalMinutes = 0,
+    totalGoals = 0,
+    totalAssists = 0;
+  const competitionsSet = new Set();
+  const seasonsSet = new Set();
+  const teamsSet = new Set();
+
+  // Calculate totals and distinct competitions
+  playerStats.forEach((stat) => {
+    totalGames += Number(stat.games);
+    totalMinutes += Number(stat.minutes);
+    totalGoals += Number(stat.goals);
+    totalAssists += Number(stat.assists);
+    competitionsSet.add(stat.comp_id);
+    seasonsSet.add(stat.season);
+    teamsSet.add(stat.team_id);
+  });
+
+  // Calculate averages or specific metrics for the totals row
+  const totalGoalsPer90 = (totalGoals / totalMinutes) * 90;
+  const distinctCompetitions = competitionsSet.size;
+  const distinctSeasons = seasonsSet.size;
+  const distinctTeams = teamsSet.size;
+
   // Fill the table body with player stats
   playerStats.forEach((stat) => {
     const row = tbody.insertRow();
@@ -64,6 +90,22 @@ const createTable = (playerStats) => {
     row.insertCell().textContent = stat.assists;
     row.insertCell().textContent = goalsPer90(stat.goals, stat.minutes);
   });
+
+  // Append totals row
+  const totalsRow = tbody.insertRow();
+  totalsRow.style.backgroundColor = "#f2f2f2"; // Make totals row gray
+
+  // Manually add cells for the totals row with dynamic seasons and clubs
+  totalsRow.insertCell().textContent = `${distinctSeasons} Seasons`;
+  totalsRow.insertCell().textContent = ""; // Age left blank
+  totalsRow.insertCell().textContent = `${distinctTeams} Clubs`;
+  totalsRow.insertCell().textContent = ""; // Country left blank
+  totalsRow.insertCell().textContent = `${distinctCompetitions} Competitions`;
+  totalsRow.insertCell().textContent = totalGames.toLocaleString();
+  totalsRow.insertCell().textContent = totalMinutes.toLocaleString();
+  totalsRow.insertCell().textContent = totalGoals.toLocaleString();
+  totalsRow.insertCell().textContent = totalAssists.toLocaleString();
+  totalsRow.insertCell().textContent = totalGoalsPer90.toFixed(2);
 
   // Add the table to the body
   // Inside your createTable function, before appending the table to the body
